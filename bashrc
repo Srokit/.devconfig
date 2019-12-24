@@ -7,4 +7,10 @@
 
 # Function shortcuts
 
-# TODO: Fill in
+gacan() {
+    git add -u && git commit --amend --no-edit
+}
+
+gad() {
+    git add .
+}
