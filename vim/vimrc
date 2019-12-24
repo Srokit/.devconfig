@@ -1,0 +1,5 @@
+
+let mapleader=","
+
+inoremap <leader><leader> <esc>
+vnoremap <leader><leader> <esc>
