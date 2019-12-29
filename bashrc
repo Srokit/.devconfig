@@ -14,3 +14,11 @@ gacan() {
 gad() {
     git add .
 }
+
+# Startup commands below
+
+# always work in tmux session
+tmux
+
+# exit whole terminal session after tmux exits
+exit
