@@ -24,23 +24,26 @@ fi
 if [ "$PM" = brew ]; then
   which brew > /dev/null
   if [ "$?" != 0 ]; then
-    sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
+    /bin/bash -c \
+      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
   fi
 fi
 
 # Tmux install if needed
-which tmux
-if [ "$?" != 0 ]; then
-  sudo "$PM" install tmux
+if [[ -z "$(which tmux)" ]]; then
+  "$PM" install tmux
 fi
 
-which zsh 
-if [ "$?" != 0 ]; then
-  sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [[ -z "$(which zsh)" ]]; then
+  "$PM" install zsh
+fi
+
+if [[ -z "$ZSH" || ! -d ~/.oh-my-zsh ]]; then
+  rm -f ~/.zshrc
+  echo 'n' | /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   # Append theme and onto end of generated zshrc
-  cat ~/.zshrc ./zsh_theme >> ~/.zshrc
+  cat ~/.devconfig/zshrc_theme >> ~/.zshrc
   # Append command to source bashrc
   echo 'source ~/.bashrc' >> ~/.zshrc
 fi
-
-sudo chsh -s "$(which zsh)"

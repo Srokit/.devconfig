@@ -1,22 +1,14 @@
 # Configuration for dev work. 
 
-Rename .devconfig and placing under home dir.
+Clone this repo to home dir and run setup.sh.
 
 ## Setup
 
-Running setup.sh will create both of the symlinks mentioned below.
-Warning: The ~/.bashrc and ~/.vim directories will be deleted if
-they already exist before running the script.
+Running setup.sh will create the symlinks for the config files that need to be
+in the home dir.
 
-## Vim
+## Compatibilty across devices
 
-$ ln -s ./.vim ~/.vim
-
-## Bash
-
-$ ln -s ./.bashrc ~/.bashrc
-
-or
-
-In ~/.bashrc...
-source ~/.devconfig/.bashrc
+Each of the configuration files is aware of which device the scripts are run on
+and include the necessary private scripts as apporiate such as work specific
+code.
