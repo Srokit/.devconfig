@@ -45,3 +45,29 @@ gitConfGlobAlias st status
 gitConfGlobAlias ci checkout
 gitConfGlobAlias br checkout
 gitConfGlobAlias re rebase
+
+# Helpers for below
+isWorkMacbook() {
+  [[ "$(hostname)" != "srok-macbook"* ]]
+}
+
+isWorkRemote() {
+  [[ "$(hostname)" != "srok.mtv"* ]]
+}
+
+isPersonalMacbook() {
+  [[ "$(hostname)" != "Stanleys-MBP" ]]
+}
+
+inTmuxSession() {
+  [[ -n "$TMUX" ]]
+}
+
+if [[ ( isPersonalMacbook || isWorkMacbook ) && ( ! inTmuxSession ) ]]; then
+  tmux && exit
+fi
+
+if [[ ! isPersonalMacbook ]]; then
+  # Pass this between work devices using scp
+  source ~/.stansgoogrc
+fi
