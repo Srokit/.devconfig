@@ -2,9 +2,18 @@
 
 let mapleader=","
 
-" Theme
-colorscheme solarized
-set background=dark
+syntax off
+
+" disable old vim things holding it back
+set nocompatible
+
+" Work specific
+if system("echo $(hostname)") =~ "srok\\.mtv.*"
+  source /usr/share/vim/google/google.vim
+endif
+
+" To see a warning when we hit column 81
+set colorcolumn=81
 
 " turn beeping off
 set noerrorbells visualbell t_vb=
@@ -40,18 +49,10 @@ set backspace=2
 set number
 set ruler
 
-syntax on
-filetype plugin indent on
 
 " indentation
 " round indentations to mults of shift width
 set shiftround
-
-" width (can be changed with setShift4 function below)
-" Default to 2 spaces for now
-set shiftwidth=2
-set tabstop=2
-set softtabstop=2
 
 " spaces > tabs
 set expandtab
@@ -108,12 +109,10 @@ nnoremap <bs> <nop>
 vnoremap <bs> <nop>
 nnoremap <del> <nop>
 
-augroup python_commands
-    au!
-    au FileType python onoremap <buffer> if :<c-u>execute "normal! ?^\\def.*$\r/^\\s*return.*$\r$"<cr>
-    au FileType python iabbrev <buffer> tt True
-    au FileType python iabbrev <buffer> ff False
-augroup END
+
+" Show 80th column
+match ColorColumn "\%80v."
+set colorcolumn=80
 
 " Functions below
 
@@ -128,3 +127,32 @@ function SetShift2()
     set tabstop=2
     set softtabstop=2
 endfunction
+
+" Default exapnd tabs to 2 spaces
+call SetShift2()
+
+" File specific
+
+augroup java_commands
+  au!
+  au FileType java <buffer> call SetShift4()
+augroup END
+
+augroup python_commands
+    au!
+    " move operator for inside a python function
+    " Ex: vif inside a python function will visually select everythin below the
+    " def line and including the return statemnt
+    au FileType python onoremap <buffer> if :<c-u>execute "normal! ?^\\def.*$\r/^\\s*return.*$\r$"<cr>
+    au FileType python iabbrev <buffer> tt True
+    au FileType python iabbrev <buffer> ff False
+augroup END
+
+syntax on
+filetype plugin indent on
+
+colorscheme solarized
+set background=dark
+
+" solarized makes ColorColumn a stupid color
+hi ColorColumn ctermfg=Red
