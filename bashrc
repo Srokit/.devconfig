@@ -1,10 +1,6 @@
 # Startup shell script.
 # Either have existing ~/.bashrc source this file or symlink it.
 
-# Environemnt variables
-
-# TODO: Fill in
-
 # Function shortcuts
 
 gacan() {
@@ -15,10 +11,13 @@ gad() {
     git add .
 }
 
-# Startup commands below
+gitConfGlobAlias() {
+  git config --global alias.$1 $2
+}
 
-# always work in tmux session
-tmux
-
-# exit whole terminal session after tmux exits
-exit
+# Initial commands
+gitConfGlobAlias co checkout
+gitConfGlobAlias st status
+gitConfGlobAlias ci checkout
+gitConfGlobAlias br checkout
+gitConfGlobAlias re rebase

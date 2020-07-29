@@ -1,9 +1,14 @@
 " Stan Rokita's vimrc!
+
 let mapleader=","
 
 " Theme
 colorscheme solarized
 set background=dark
+
+" turn beeping off
+set noerrorbells visualbell t_vb=
+autocmd GUIEnter * set visualbell t_vb=
 
 " quick exit of modes
 inoremap <leader><leader> <esc>
@@ -17,6 +22,15 @@ nnoremap <leader>sv :source<space>$MYVIMRC<cr>
 nnoremap <leader>tn :tabnew<cr>
 nnoremap <leader>tk :tabn<cr>
 nnoremap <leader>tj :tabp<cr>
+
+" switch panes
+nnoremap <C-j> <C-W>j
+nnoremap <C-k> <C-W>k
+nnoremap <C-h> <C-W>h
+nnoremap <C-l> <C-W>l
+
+" no *.swp files
+set noswapfile
 
 " copy paste stuff
 set clipboard=unnamed
@@ -33,20 +47,35 @@ filetype plugin indent on
 " round indentations to mults of shift width
 set shiftround
 
-" width
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
+" width (can be changed with setShift4 function below)
+" Default to 2 spaces for now
+set shiftwidth=2
+set tabstop=2
+set softtabstop=2
 
-" spaces > tabs (also i use python the most so 4 spaces)
+" spaces > tabs
 set expandtab
 
 " new stuff i learned
+
+" paste and leave content that was pasted in default register
+" _ is the blackhole register and P pastes without touching registers
+vnoremap <leader>p "_dP
 
 " tenths of a second that previous matching paren will be highlighted
 set matchtime=2
 " activate the show prev paren feature
 set showmatch
+
+" keep visual selection aftering indenting
+vnoremap < <gv
+vnoremap > >gv
+
+" move different distances
+nnoremap K 10k
+vnoremap K 10k
+nnoremap J 10j
+vnoremap J 10j
 
 " put parentheses around white space seperated word
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lell
@@ -54,7 +83,7 @@ nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lell
 " put parenthese around curren visual selection
 vnoremap <leader>" <esc>`<i"<esc>`>a"<esc>l
 
-" instead of hard to reach o and $ (these do overmap presets)
+" instead of hard to reach 0 and $ (these do overmap presets)
 nnoremap H ^
 vnoremap H ^
 nnoremap L $
@@ -79,9 +108,23 @@ nnoremap <bs> <nop>
 vnoremap <bs> <nop>
 nnoremap <del> <nop>
 
-augroup python_stuff
+augroup python_commands
     au!
     au FileType python onoremap <buffer> if :<c-u>execute "normal! ?^\\def.*$\r/^\\s*return.*$\r$"<cr>
     au FileType python iabbrev <buffer> tt True
     au FileType python iabbrev <buffer> ff False
 augroup END
+
+" Functions below
+
+function SetShift4()
+    set shiftwidth=4
+    set tabstop=4
+    set softtabstop=4
+endfunction
+
+function SetShift2()
+    set shiftwidth=2
+    set tabstop=2
+    set softtabstop=2
+endfunction
