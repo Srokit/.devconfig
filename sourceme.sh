@@ -54,18 +54,18 @@ gitConfGlobAlias br checkout
 gitConfGlobAlias re rebase
 
 if isWorkMacbook; then
-  if ! fileExists ~/.setupworkmacbook.sh; then
-    echo "cannot source env vars from ~/.setupworkmacbook.sh.\
+  if ! fileExists ~/.goog-envsetup-macbook.sh; then
+    echo "cannot source env vars from ~/.goog-envsetup-macbook.sh.\
 No such file exists"
   else
-    . ~/.setupworkmacbook.sh
+    . ~/.goog-envsetup-macbook.sh
   fi
 elif isWorkRemote; then
-  if ! fileExists ~/.setupworkremote.sh; then
-    echo "Cannot source env vars from ~/.setupworkremote.sh.\
+  if ! fileExists ~/.goog-envsetup-remote.sh; then
+    echo "Cannot source env vars from ~/.goog-envsetup-remote.sh.\
 No such file exists"
   else
-    . ~/.setupworkremote.sh
+    . ~/.goog-envsetup-remote.sh
   fi
 fi
 
