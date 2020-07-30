@@ -92,6 +92,8 @@ if ! isPersonalMacbook; then
   else #isWorkRemote
     if ! fileExists ~/.goog-remote-setup.sh; then
       echo "Cannot find ~/.goog-remote-setup.sh"
+    else
+      . ~/.goog-remote-setup.sh
     fi
   fi
 fi
