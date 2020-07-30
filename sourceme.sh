@@ -74,18 +74,20 @@ if ! isPersonalMacbook; then
   if ! fileExists ~/.goog-common-setup.sh; then
     echo "Cannot find ~/.goog-common-setup.sh."
     if isWorkMacbook; then
-      scpFromRemoteWork "~/.goog-common-setup.sh" ~
-      . ~/.goog-common-setup.sh
+      if scpFromRemoteWork "~/.goog-common-setup.sh" ~; then
+        . ~/.goog-common-setup.sh
+      fi
     fi
   else
     . ~/.goog-common-setup.sh
   fi
   if isWorkMacbook; then
-    echo "Cannot find ~/.goog-macbook-setup.sh"
     if ! fileExists ~/.goog-macbook-setup.sh; then
+      echo "Cannot find ~/.goog-macbook-setup.sh"
       # Might keep a copy on the remote for backup
-      scpFromRemoteWork "~/.goog-macbook-setup.sh" ~
-      . ~/.goog-macbook-setup.sh
+      if scpFromRemoteWork "~/.goog-macbook-setup.sh" ~; then
+        . ~/.goog-macbook-setup.sh
+      fi
     else
       . ~/.goog-macbook-setup.sh
     fi
@@ -98,8 +100,13 @@ if ! isPersonalMacbook; then
   fi
 fi
 
-if ! isWorkRemote && ! inTmuxSession; then
+if isPersonalMacbook && ! inTmuxSession; then
   # automatically start up tmux which will start. The conditional will ensure
   # that we do not enter a loop
   tmux
+elif isWorkMacbook && ! inZshSession; then
+  # tmux would normall start a nested zsh instance, but if we do not start
+  #  that then we must start ourselves here
+  zsh
+  exit
 fi
