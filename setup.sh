@@ -1,49 +1,75 @@
 #!/bin/bash
-# Setup.sh
 
-# Log commands as they are run
-set -x
+# Exit on error
+set -e
 
-# Setup links for config files
-rm -rf ~/.vim
-ln -s ~/.devconfig/vim ~/.vim
-rm -f ~/.bashrc
-ln -s ~/.devconfig/bashrc ~/.bashrc
-rm -f ~/.tmux.conf
-ln -s ~/.devconfig/tmux.conf ~/.tmux.conf
+. ~/.devconfig/helpers.sh
 
 # Change package manager prefix for install commands based on OS
-if [[ $OSTYPE == "darwin"* ]]; then
+if osIsMac; then
+  echo "Recognized OS as mac"
   PM=brew
 else
   # Assume linux
+  echo "Recognized OS as linux"
   PM=apt
 fi
 
-# Get package manger bc Mac might not have brew yet
-if [ "$PM" = brew ]; then
-  which brew > /dev/null
-  if [ "$?" != 0 ]; then
-    /bin/bash -c \
+# package manager (NOTE: cannot install linux apt)
+if osIsMac; then
+  # homebrew needs access to these files
+  sudo chown -R $(whoami) /usr/local/bin /usr/local/etc /usr/local/sbin\
+    /usr/local/share /usr/local/share/doc
+  chmod u+w /usr/local/bin /usr/local/etc /usr/local/sbin /usr/local/share\
+    /usr/local/share/doc
+  if ! cmdExists brew; then
+    echo "installing homebrew"
+    /bin/sh -c \
       "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
+  else
+    echo "homebrew already installed, upgrading..."
+    brew upgrade
   fi
 fi
 
-# Tmux install if needed
-if [[ -z "$(which tmux)" ]]; then
+# Vim
+if ! cmdExists vim; then
+  echo "installing vim"
+  "$PM" install vim
+else
+  echo "vim already installed"
+fi
+rm -rf ~/.vim
+ln -s ~/.devconfig/vim ~/.vim
+
+# Tmux
+if ! cmdExists tmux; then
+  echo "installing tmux"
   "$PM" install tmux
+else
+  echo "tmux already good"
 fi
+rm -f ~/.tmux.conf
+ln -s ~/.devconfig/tmux.conf ~/.tmux.conf
 
-if [[ -z "$(which zsh)" ]]; then
+# ZSH
+if ! cmdExists zsh; then
+  echo "installing zsh"
   "$PM" install zsh
+else
+  echo "zsh already installed"
 fi
+echo "Attempting to change the shell to zsh"
+chsh -s "$(which zsh)"
 
-if [[ -z "$ZSH" || ! -d ~/.oh-my-zsh ]]; then
-  rm -f ~/.zshrc
-  echo 'n' | /bin/bash -c \
+# OhMyZsh
+if ! dirExists ~/.oh-my-zsh; then
+  echo "installing oh-my-zsh"
+  # insert n to say no to setting zsh as default
+  echo 'n' | /bin/sh -c \
     "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  # Append theme and onto end of generated zshrc
-  cat ~/.devconfig/zshrc_theme >> ~/.zshrc
-  # Append command to source bashrc
-  echo 'source ~/.bashrc' >> ~/.zshrc
+else
+  echo "oh-my-zsh already installed"
 fi
+rm -f ~/.zshrc
+ln -s ~/.devconfig/zshrc ~/.zshrc
