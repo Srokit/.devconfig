@@ -27,7 +27,7 @@ gaca() {
 }
 
 gitConfGlobAlias() {
-  git config alias.$1 $2
+  git config --global alias.$1 $2
 }
 
 getCurrBranch() {
@@ -53,8 +53,8 @@ gitConfGlobAlias ci commit
 gitConfGlobAlias br checkout
 gitConfGlobAlias re rebase
 
-git config credential.helper store
-git config pull.rebase false
+git config --global credential.helper store
+git config --global pull.rebase false
 
 if isWorkMacbook; then
   if ! fileExists ~/.goog-envsetup-macbook.sh; then

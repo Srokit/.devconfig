@@ -3,12 +3,22 @@
 let mapleader=","
 
 syntax off
-
-" disable old vim things holding it back
+filetype off
 set nocompatible
 
-" Work specific
-if system("echo $(hostname)") =~ "srok\\.mtv.*"
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+
+" Bracket and other paired chars completion
+Plugin 'jiangmiao/auto-pairs'
+
+Plugin 'ycm-core/YouCompleteMe'
+
+call vundle#end()
+
+
+if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
   source /usr/share/vim/google/google.vim
 endif
 

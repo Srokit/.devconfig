@@ -39,32 +39,16 @@ if osIsMac; then
 fi
 
 # Vim
-if ! cmdExists vim; then
-  echo "installing vim"
-  pmInstall vim
-else
-  echo "vim already installed"
-fi
 rm -rf ~/.vim
 ln -s ~/.devconfig/vim ~/.vim
 
 # Tmux
-if ! cmdExists tmux; then
-  echo "installing tmux"
-  pmInstall tmux
-else
-  echo "tmux already good"
-fi
+pmInstall tmux
 rm -f ~/.tmux.conf
 ln -s ~/.devconfig/tmux.conf ~/.tmux.conf
 
 # ZSH
-if ! cmdExists zsh; then
-  echo "installing zsh"
-  pmInstall zsh
-else
-  echo "zsh already installed"
-fi
+pmInstall zsh
 
 # Remove workstation doesn't have ability
 if ! isWorkRemote; then
@@ -83,3 +67,36 @@ else
 fi
 rm -f ~/.zshrc
 ln -s ~/.devconfig/zshrc ~/.zshrc
+
+
+# YCM
+# https://github.com/ycm-core/YouCompleteMe
+
+# ONLY SUPPORTED ON WORK REMOTE FOR NOW
+if isWorkRemote; then
+
+  # Build prereqs
+  pmInstall build-essential cmake vim python3-dev
+
+  if ! dirExists ~/.vim/bundle/YouCompleteMe; then
+    echo "YouCompleteMe vim plugin not installed yet. Install first."
+    exit 1
+  fi
+
+  # Compile YCM
+  cd ~/.vim/bundle/YouCompleteMe
+  python3 install.py --all
+
+  # Prereqs
+  pmInstall mono nodejs
+
+  # Install go
+  if ! cmdExists go; then
+    FN=go1.14.6.linux-amd64.tar.gz
+    curl https://dl.google.com/go/$FN -o /tmp/$FN
+    sudo tar -C /usr/local -xzf /tmp/$FN
+    export PATH=$PATH:/usr/local/go/bin
+  fi
+fi # isWorkRemote
+
+# Finally install actual npm
