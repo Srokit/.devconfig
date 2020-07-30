@@ -42,3 +42,7 @@ isPersonalMacbook() {
 inTmuxSession() {
   [[ -n $TMUX ]]
 }
+
+inZshSession() {
+  [[ $SHELL = *zsh* ]]
+}
