@@ -49,7 +49,7 @@ findFilenameInCwd() {
 # Initial commands
 gitConfGlobAlias co checkout
 gitConfGlobAlias st status
-gitConfGlobAlias ci checkout
+gitConfGlobAlias ci commit
 gitConfGlobAlias br checkout
 gitConfGlobAlias re rebase
 

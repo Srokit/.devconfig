@@ -28,11 +28,11 @@ osIsMac() {
 }
 
 isWorkMacbook() {
-  [[ "$(hostname)" = *srok-macbook* ]]
+  [[ "$(hostname)" = *$REMOTE_WORK_USER-macbook* ]]
 }
 
 isWorkRemote() {
-  [[ $(hostname) = *srok.mtv* ]]
+  [[ $(hostname) = *$REMOTE_WORK_HOST* ]]
 }
 
 isPersonalMacbook() {
