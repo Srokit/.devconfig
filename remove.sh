@@ -5,33 +5,39 @@
 . ~/.devconfig/helpers.sh
 
 # Change package manager prefix for install commands based on OS
-if osIsMac; then
-  PM=brew
-else
-  PM=apt
-fi
+
+
+pmRemove() {
+  if osIsMac; then
+    brew remove $@
+  else
+    sudo DEBIAN_FRONTEND=noninteractive apt-get remove -qq $@ < /dev/null > /dev/null
+  fi
+}
 
 echo "removing package manager modules..."
 
 echo "vim"
-"$PM" remove vim
+pmRemove vim
 
 echo "tmux"
-"$PM" remove tmux
+pmRemove tmux
 
 echo "zsh"
-"$PM" remove zsh
+pmRemove zsh
 
 echo "removing oh-my-zsh dir"
-rm -rf $ZSH
+rm -rf ~/.oh-my-zsh
 
 echo "removing .vim folder"
 rm -rf ~/.vim
 
 echo "removing .zshrc"
-rm ~/.zshrc
+rm -f ~/.zshrc
 
 if isWorkMacbook; then
-  echo "removing .stansgoogrc.sh"
-  rm ~/.stansgoogrc
+  echo "removing .goog-common-setup.sh"
+  rm -f ~/.goog-common-setup.sh
+  echo "removing .goog-macbook-setup.sh"
+  rm -f ~/.goog-macbook-setup.sh
 fi

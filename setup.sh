@@ -5,14 +5,20 @@ set -e
 
 . ~/.devconfig/helpers.sh
 
+pmInstall() {
+  if osIsMac; then
+    brew install $@
+  else
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $@ < /dev/null > /dev/null
+  fi
+}
+
 # Change package manager prefix for install commands based on OS
 if osIsMac; then
   echo "Recognized OS as mac"
-  PM=brew
 else
   # Assume linux
   echo "Recognized OS as linux"
-  PM=apt
 fi
 
 # package manager (NOTE: cannot install linux apt)
@@ -35,7 +41,7 @@ fi
 # Vim
 if ! cmdExists vim; then
   echo "installing vim"
-  "$PM" install vim
+  pmInstall vim
 else
   echo "vim already installed"
 fi
@@ -45,7 +51,7 @@ ln -s ~/.devconfig/vim ~/.vim
 # Tmux
 if ! cmdExists tmux; then
   echo "installing tmux"
-  "$PM" install tmux
+  pmInstall tmux
 else
   echo "tmux already good"
 fi
@@ -55,12 +61,16 @@ ln -s ~/.devconfig/tmux.conf ~/.tmux.conf
 # ZSH
 if ! cmdExists zsh; then
   echo "installing zsh"
-  "$PM" install zsh
+  pmInstall zsh
 else
   echo "zsh already installed"
 fi
-echo "Attempting to change the shell to zsh"
-chsh -s "$(which zsh)"
+
+# Remove workstation doesn't have ability
+if ! isWorkRemote; then
+  echo "Attempting to change the shell to zsh"
+  chsh -s "$(which zsh)"
+fi
 
 # OhMyZsh
 if ! dirExists ~/.oh-my-zsh; then

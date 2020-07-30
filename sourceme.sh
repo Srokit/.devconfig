@@ -42,6 +42,10 @@ grc() {
   git rebase --continue
 }
 
+findFilenameInCwd() {
+  find . -name $@
+}
+
 # Initial commands
 gitConfGlobAlias co checkout
 gitConfGlobAlias st status
