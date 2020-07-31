@@ -7,7 +7,7 @@ set -e
 
 pmInstall() {
   if osIsMac; then
-    brew install $@
+    brew install $@ < /dev/null > /dev/null
   else
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $@ < /dev/null > /dev/null
   fi
@@ -33,8 +33,7 @@ if osIsMac; then
     /bin/sh -c \
       "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
   else
-    echo "homebrew already installed, upgrading..."
-    brew upgrade
+    echo "homebrew already installed"
   fi
 fi
 
@@ -46,8 +45,10 @@ rm -rf ~/.vim
 ln -s ~/.devconfig/vim ~/.vim
 
 # Vundle for vim plugins
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-vim +PluginInstall +qall
+if ! dirExists ~/.vim/bundle/Vundle.vim; then
+  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+  vim +PluginInstall +qall
+fi
 
 # Tmux
 pmInstall tmux
