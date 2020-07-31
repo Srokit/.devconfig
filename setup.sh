@@ -78,6 +78,9 @@ if isWorkRemote; then
   # Build prereqs
   pmInstall build-essential cmake vim python3-dev
 
+  # Prereqs
+  pmInstall mono-complete nodejs npm
+
   if ! dirExists ~/.vim/bundle/YouCompleteMe; then
     echo "YouCompleteMe vim plugin not installed yet. Install first."
     exit 1
@@ -86,9 +89,6 @@ if isWorkRemote; then
   # Compile YCM
   cd ~/.vim/bundle/YouCompleteMe
   python3 install.py --all
-
-  # Prereqs
-  pmInstall mono nodejs
 
   # Install go
   if ! cmdExists go; then

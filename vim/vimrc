@@ -17,7 +17,6 @@ Plugin 'ycm-core/YouCompleteMe'
 
 call vundle#end()
 
-
 if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
   source /usr/share/vim/google/google.vim
 endif
@@ -119,6 +118,9 @@ nnoremap <bs> <nop>
 vnoremap <bs> <nop>
 nnoremap <del> <nop>
 
+" For RemoteWorkLocal api
+nnoremap <leader>re :call RemoteWorkEdit('')<left><left>
+nnoremap <leader>rp :call RemoteWorkPushThis()<cr>
 
 " Show 80th column
 match ColorColumn "\%80v."
@@ -137,6 +139,88 @@ function SetShift2()
     set tabstop=2
     set softtabstop=2
 endfunction
+
+function PullFileFromRemoteWork(remote_file, local_file)
+  execute "!scpFromRemoteWork " . a:remote_file . " " . a:local_file
+  return (v:shell_error == 0)
+endfunction
+
+function PushFileToRemoteWork(local_file, remote_file)
+  execute "!scpToRemoteWork " . a:local_file . " " . a:remote_file
+  return (v:shell_error == 0)
+endfunction
+
+function LocalAbsPathForRemoteWorkFile(file)
+  return g:local_remote_work_top . a:file
+endfunction
+
+function RemoteAbsPathForRemoteWorkFile(file)
+  return g:remote_remote_work_top . a:file
+endfunction
+
+function PullFileFromRemoteWorkRelativeToTop(file)
+  return call PullFileFromRemoteWork(RemoteAbsPathForRemoteWorkFile(a:file), LocalAbsPathForRemoteWorkFile(a:file))
+endfunction
+
+function PushFileToRemoteWorkRelativeToTop(file)
+  return call PushFileToRemoteWork(LocalAbsPathForRemoteWorkFile(a:file), RemoteAbsPathForRemoteWorkFile(a:file))
+endfunction
+
+function Mkdir(dir)
+  execute "!mkdir " . a:dir
+  return (v:shell_error == 0)
+endfunction
+
+function PathOnly(file)
+  return substitute(a:file, "(.*/)", "", "")
+endfunction
+
+function ClearLocalRemoteWorkDir()
+  execute "!rm -rf " . g:local_remote_work_top . "/*"
+endfunction
+
+function PullFileFromRemoteWorkAndOpen(file)
+  call ClearLocalRemoteWorkDir()
+  let l:local_file = LocalAbsPathForRemoteWorkFile(a:file)
+  call Mkdir(PathOnly(l:local_file))
+  let l:success = PullFileFromRemoteWorkRelativeToTop(a:file)
+  let l:l:msg = ""
+  if l:success
+    let l:msg = l:msg . "Success"
+  else
+    let l:msg = l:msg . "Failure"
+  endif
+  let l:msg = l:msg . " when pulling file " . a:file
+  echo l:msg
+  execute "tabf" . l:local_file
+endfunction
+
+function PushCurrentFileToRemoteWork()
+  let l:current_file = expand('%:p')
+  let l:file = substitute(l:current_file, g:local_remote_work_top, "", "")
+  let l:success = PushFileToRemoteWorkRelativeToTop(l:file)
+  if l:success
+    let l:msg = l:msg . "Success"
+  else
+    let l:msg = l:msg . "Failure"
+  endif
+  let l:msg = l:msg . " for file " . a:file
+  echo l:msg
+endfunction
+
+function RemoteWorkEdit(file)
+  call PullFileFromRemoteWorkAndOpen(a:file)
+endfunction
+
+function RemoteWorkPushThis()
+  call PushCurrentFileToRemoteWork()
+endfunction
+
+" Set global remote work local path for push and pull
+let g:local_remote_work_top = system('echo $LOCAL_REMOTE_WORK_TOP')
+
+" Change this when root of local work should change
+let g:remote_remote_work_top = "/ssd1/srok/android/sc-d1-dev"
 
 " Default exapnd tabs to 2 spaces
 call SetShift2()
@@ -166,3 +250,8 @@ set background=dark
 
 " solarized makes ColorColumn a stupid color
 hi ColorColumn ctermfg=Red
+
+" Tell YCM to point to .ycm_extra_conf.py in home if it exists
+if system("if ! fileExists .ycm_extra_conf.py; then; echo true; else; echo false; fi") == "true"
+  let g:ycm_global_ycm_extra_conf="~/.ycm_extra_conf.py"
+endif
