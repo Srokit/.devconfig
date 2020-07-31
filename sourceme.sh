@@ -2,6 +2,9 @@
 
 . ~/.devconfig/helpers.sh
 
+# Env vars
+export LOCAL_REMOTE_WORK_TOP=~/.local_remote_work
+
 # Source this file for shortcuts in the shell of your choice
 
 # Function shortcuts

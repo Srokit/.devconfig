@@ -13,8 +13,6 @@ Plugin 'VundleVim/Vundle.vim'
 " Bracket and other paired chars completion
 Plugin 'jiangmiao/auto-pairs'
 
-Plugin 'ycm-core/YouCompleteMe'
-
 call vundle#end()
 
 if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
@@ -120,7 +118,11 @@ nnoremap <del> <nop>
 
 " For RemoteWorkLocal api
 nnoremap <leader>re :call RemoteWorkEdit('')<left><left>
-nnoremap <leader>rp :call RemoteWorkPushThis()<cr>
+nnoremap <leader>rt :call RemoteWorkPushThis()<cr>
+nnoremap <leader>rp :call RemoteWorkPush('')<left><left>
+nnoremap <leader>rre :call RemoteWorkRefreshAndEdit('')<left><left>
+nnoremap <leader>rc :call RemoteWorkClear()<cr>
+nnoremap <leader>rf :call RemoteWorkRefresh('')<left><left>
 
 " Show 80th column
 match ColorColumn "\%80v."
@@ -140,87 +142,98 @@ function SetShift2()
     set softtabstop=2
 endfunction
 
+"" Remote Work Helpers
+
 function PullFileFromRemoteWork(remote_file, local_file)
-  execute "!scpFromRemoteWork " . a:remote_file . " " . a:local_file
+  execute "!zsh -c 'source ~/.devconfig/sourceme.sh && scpFromRemoteWork " . a:remote_file . " " . a:local_file . "'"
   return (v:shell_error == 0)
 endfunction
 
 function PushFileToRemoteWork(local_file, remote_file)
-  execute "!scpToRemoteWork " . a:local_file . " " . a:remote_file
+  execute "!zsh -c 'source ~/.devconfig/sourceme.sh && scpToRemoteWork " . a:local_file . " " . a:remote_file . "'"
   return (v:shell_error == 0)
 endfunction
 
 function LocalAbsPathForRemoteWorkFile(file)
-  return g:local_remote_work_top . a:file
+  return g:local_remote_work_top . '/' .  a:file
 endfunction
 
 function RemoteAbsPathForRemoteWorkFile(file)
-  return g:remote_remote_work_top . a:file
+  return g:remote_remote_work_top . '/' . a:file
 endfunction
 
 function PullFileFromRemoteWorkRelativeToTop(file)
-  return call PullFileFromRemoteWork(RemoteAbsPathForRemoteWorkFile(a:file), LocalAbsPathForRemoteWorkFile(a:file))
+  return PullFileFromRemoteWork(RemoteAbsPathForRemoteWorkFile(a:file), LocalAbsPathForRemoteWorkFile(a:file))
 endfunction
 
 function PushFileToRemoteWorkRelativeToTop(file)
-  return call PushFileToRemoteWork(LocalAbsPathForRemoteWorkFile(a:file), RemoteAbsPathForRemoteWorkFile(a:file))
-endfunction
-
-function Mkdir(dir)
-  execute "!mkdir " . a:dir
-  return (v:shell_error == 0)
+  return PushFileToRemoteWork(LocalAbsPathForRemoteWorkFile(a:file), RemoteAbsPathForRemoteWorkFile(a:file))
 endfunction
 
 function PathOnly(file)
-  return substitute(a:file, "(.*/)", "", "")
-endfunction
-
-function ClearLocalRemoteWorkDir()
-  execute "!rm -rf " . g:local_remote_work_top . "/*"
-endfunction
-
-function PullFileFromRemoteWorkAndOpen(file)
-  call ClearLocalRemoteWorkDir()
-  let l:local_file = LocalAbsPathForRemoteWorkFile(a:file)
-  call Mkdir(PathOnly(l:local_file))
-  let l:success = PullFileFromRemoteWorkRelativeToTop(a:file)
-  let l:l:msg = ""
-  if l:success
-    let l:msg = l:msg . "Success"
-  else
-    let l:msg = l:msg . "Failure"
-  endif
-  let l:msg = l:msg . " when pulling file " . a:file
-  echo l:msg
-  execute "tabf" . l:local_file
+  " Super dirty implementation because I don't know vimscript lol
+  let l:i = strlen(a:file) - 1
+  let l:new_file = a:file
+  while l:new_file[l:i] != '/'
+    let l:i = l:i - 1
+    let l:new_file = l:new_file[0:l:i]
+  endwhile
+  return l:new_file
 endfunction
 
 function PushCurrentFileToRemoteWork()
   let l:current_file = expand('%:p')
   let l:file = substitute(l:current_file, g:local_remote_work_top, "", "")
-  let l:success = PushFileToRemoteWorkRelativeToTop(l:file)
-  if l:success
-    let l:msg = l:msg . "Success"
-  else
-    let l:msg = l:msg . "Failure"
-  endif
-  let l:msg = l:msg . " for file " . a:file
-  echo l:msg
+  call PushFileToRemoteWorkRelativeToTop(l:file)
 endfunction
 
-function RemoteWorkEdit(file)
-  call PullFileFromRemoteWorkAndOpen(a:file)
+"" END Remote Work Helpers
+
+"" Remote Work Interface
+
+function RemoteWorkClear()
+  call delete(g:local_remote_work_top, 'rf')
+endfunction
+
+function RemoteWorkDelete(file)
+  call delete(a:file)
+endfunction
+
+function RemoteWorkRefresh(file)
+  call RemoteWorkDelete(a:file)
+  let l:local_file = LocalAbsPathForRemoteWorkFile(a:file)
+  call mkdir(PathOnly(l:local_file), 'p')
+  call PullFileFromRemoteWorkRelativeToTop(a:file)
+endfunction
+
+function RemoteWorkPush(file)
+  call PushFileToRemoteWorkRelativeToTop(a:file)
 endfunction
 
 function RemoteWorkPushThis()
   call PushCurrentFileToRemoteWork()
 endfunction
 
+function RemoteWorkEdit(file)
+  execute "e " . LocalAbsPathForRemoteWorkFile(a:file)
+endfunction
+
+function RemoteWorkRefreshAndEdit(file)
+  call RemoteWorkRefresh(a:file)
+  call RemoteWorkEdit(a:file)
+endfunction
+
+"" END Remote Work Interface
+
+" Remote Work Configuration
+
 " Set global remote work local path for push and pull
-let g:local_remote_work_top = system('echo $LOCAL_REMOTE_WORK_TOP')
+let g:local_remote_work_top = $LOCAL_REMOTE_WORK_TOP
 
 " Change this when root of local work should change
 let g:remote_remote_work_top = "/ssd1/srok/android/sc-d1-dev"
+
+"" END Remote Work Configuration
 
 " Default exapnd tabs to 2 spaces
 call SetShift2()
