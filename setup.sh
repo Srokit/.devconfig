@@ -75,35 +75,4 @@ fi
 rm -f ~/.zshrc
 ln -s ~/.devconfig/zshrc ~/.zshrc
 
-
-# YCM
-# https://github.com/ycm-core/YouCompleteMe
-
-# ONLY SUPPORTED ON WORK REMOTE FOR NOW
-if isWorkRemote; then
-
-  # Build prereqs
-  pmInstall build-essential cmake vim python3-dev
-
-  # Prereqs
-  pmInstall mono-complete nodejs npm
-
-  if ! dirExists ~/.vim/bundle/YouCompleteMe; then
-    echo "YouCompleteMe vim plugin not installed yet. Install first."
-    exit 1
-  fi
-
-  # Compile YCM
-  cd ~/.vim/bundle/YouCompleteMe
-  python3 install.py --all
-
-  # Install go
-  if ! cmdExists go; then
-    FN=go1.14.6.linux-amd64.tar.gz
-    curl https://dl.google.com/go/$FN -o /tmp/$FN
-    sudo tar -C /usr/local -xzf /tmp/$FN
-    export PATH=$PATH:/usr/local/go/bin
-  fi
-fi # isWorkRemote
-
 # Finally install actual npm
