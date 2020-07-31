@@ -118,11 +118,15 @@ nnoremap <del> <nop>
 
 " For RemoteWorkLocal api
 nnoremap <leader>re :call RemoteWorkEdit('')<left><left>
-nnoremap <leader>rt :call RemoteWorkPushThis()<cr>
+nnoremap <leader>rpt :call RemoteWorkPushThis()<cr>
 nnoremap <leader>rp :call RemoteWorkPush('')<left><left>
-nnoremap <leader>rre :call RemoteWorkRefreshAndEdit('')<left><left>
+nnoremap <leader>rfe :call RemoteWorkRefreshAndEdit('')<left><left>
 nnoremap <leader>rc :call RemoteWorkClear()<cr>
 nnoremap <leader>rf :call RemoteWorkRefresh('')<left><left>
+nnoremap <leader>rft :call RemoteWorkRefreshAndEditThis()<cr>
+
+" Commands for RemoteWork api
+command RemoteWorkClear call RemoteWorkClear()
 
 " Show 80th column
 match ColorColumn "\%80v."
@@ -145,7 +149,8 @@ endfunction
 "" Remote Work Helpers
 
 function PullFileFromRemoteWork(remote_file, local_file)
-  execute "!zsh -c 'source ~/.devconfig/sourceme.sh && scpFromRemoteWork " . a:remote_file . " " . a:local_file . "'"
+"  execute "!zsh -c 'source ~/.devconfig/sourceme.sh && scpFromRemoteWork " . a:remote_file . " " . a:local_file . "'"
+  execute "!scp $REMOTE_WORK_USER@$REMOTE_WORK_HOST:" . a:remote_file . " " . a:local_file
   return (v:shell_error == 0)
 endfunction
 
@@ -181,9 +186,16 @@ function PathOnly(file)
   return l:new_file
 endfunction
 
+function CurrentFile()
+  return expand('%:p')
+endfunction
+
+function RemoteWorkRelativePathFromFullPath(path)
+  return substitute(l:current_file, g:local_remote_work_top, "", "")
+endfunction
+
 function PushCurrentFileToRemoteWork()
-  let l:current_file = expand('%:p')
-  let l:file = substitute(l:current_file, g:local_remote_work_top, "", "")
+  let l:file = RemoteWorkRelativePathFromFullPath(CurrentFile())
   call PushFileToRemoteWorkRelativeToTop(l:file)
 endfunction
 
@@ -206,6 +218,10 @@ function RemoteWorkRefresh(file)
   call PullFileFromRemoteWorkRelativeToTop(a:file)
 endfunction
 
+function RemoteWorkRefreshThis()
+  call RemoteWorkRefresh(RemoteWorkRelativePathFromFullPath(CurrentFile()))
+endfunction
+
 function RemoteWorkPush(file)
   call PushFileToRemoteWorkRelativeToTop(a:file)
 endfunction
@@ -218,9 +234,18 @@ function RemoteWorkEdit(file)
   execute "e " . LocalAbsPathForRemoteWorkFile(a:file)
 endfunction
 
+function RemoteWorkEditThis()
+  execute "e! " . CurrentFile()
+endfunction
+
 function RemoteWorkRefreshAndEdit(file)
   call RemoteWorkRefresh(a:file)
   call RemoteWorkEdit(a:file)
+endfunction
+
+function RemoteWorkRefreshAndEditThis()
+  call RemoteWorkRefreshThis()
+  call RemoteWorkEditThis()
 endfunction
 
 "" END Remote Work Interface

@@ -3,11 +3,19 @@
 . ~/.devconfig/helpers.sh
 
 # Env vars
+
+# Used by vimrc
 export LOCAL_REMOTE_WORK_TOP=~/.local_remote_work
+
+export DEVCONFIG=~/.devconfig
 
 # Source this file for shortcuts in the shell of your choice
 
 # Function shortcuts
+
+e() {
+  exit
+}
 
 gitdiff() {
   git difftool --tool=vimdiff $@
