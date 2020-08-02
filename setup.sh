@@ -37,6 +37,9 @@ if osIsMac; then
   fi
 fi
 
+# Python
+pmInstall python3
+
 # Git
 pmInstall git
 
