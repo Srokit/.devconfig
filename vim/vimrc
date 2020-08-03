@@ -16,7 +16,7 @@ Plugin 'jiangmiao/auto-pairs'
 call vundle#end()
 
 if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
-  source /usr/share/vim/google/google.vim
+  source ~/.googvimrc.vim
 endif
 
 " To see a warning when we hit column 81
@@ -30,13 +30,20 @@ autocmd GUIEnter * set visualbell t_vb=
 inoremap <leader><leader> <esc>
 vnoremap <leader><leader> <esc>
 
+" Super fast save
+nnoremap s :w<cr>
+
+" Super fast quit
+nnoremap q :q
+
 " for reloading vimscript
-nnoremap <leader>ev :tabf<space>$MYVIMRC<cr>
+nnoremap <leader>ev :tabe<space>$MYVIMRC<cr>
 nnoremap <leader>sv :source<space>$MYVIMRC<cr>
 
 " work with tabs
 nnoremap <leader>tn :tabnew<cr>
 nnoremap <leader>tk :tabn<cr>
+nnoremap <leader>te :tabe<space>
 nnoremap <leader>tj :tabp<cr>
 
 " switch panes
