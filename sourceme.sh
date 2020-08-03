@@ -17,6 +17,14 @@ e() {
   exit
 }
 
+c() {
+  clear
+}
+
+v() {
+  vim $@; clear
+}
+
 gitdiff() {
   git difftool --tool=vimdiff $@
 }
@@ -57,12 +65,34 @@ findFilenameInCwd() {
   find . -name $@
 }
 
+currUserDoesOwn() {
+  filenames=$@
+  oldIFS=$IFS
+  IFS=' '
+  for file in ${=filenames}; do
+    if [[ $(ls -l "$file"/.. | grep basename $file) != *$(whoami)* ]]; then
+      return 1
+    fi
+  done
+  IFS=$oldIFS
+}
+
+setupHomebrew() {
+  homebrewFolders="/usr/local/bin /usr/local/etc /usr/local/sbin /usr/local/share /usr/local/share/doc"
+  if ! currUserDoesOwn $homebrewFolders; then 
+    sudo chown -R $(whoami) ${=homebrewFolders}
+    chmod u+w ${=homebrewFolders}
+  fi
+}
+
 # Initial commands
 gitConfGlobAlias co checkout
 gitConfGlobAlias st status
 gitConfGlobAlias ci commit
 gitConfGlobAlias br checkout
 gitConfGlobAlias re rebase
+
+# setupHomebrew
 
 git config --global credential.helper store
 git config --global pull.rebase false
