@@ -270,6 +270,12 @@ let g:remote_remote_work_top = "/ssd1/srok/android/sc-d1-dev"
 " Default exapnd tabs to 2 spaces
 call SetShift2()
 
+augroup all_types
+  au!
+  " Remove trailing whitespace from file
+  au BufWritePre * %s/\s\+$//e
+augroup END
+
 " File specific
 
 augroup java_commands
@@ -291,7 +297,7 @@ syntax on
 filetype plugin indent on
 
 colorscheme solarized
-set background=light
+set background=dark
 
 " solarized makes ColorColumn a stupid color
 hi ColorColumn ctermfg=Red
