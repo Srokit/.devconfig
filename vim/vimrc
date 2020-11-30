@@ -13,6 +13,9 @@ Plugin 'VundleVim/Vundle.vim'
 " Bracket and other paired chars completion
 Plugin 'jiangmiao/auto-pairs'
 
+" NERDTree
+Plugin 'preservim/nerdtree'
+
 call vundle#end()
 
 if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
@@ -274,6 +277,11 @@ augroup all_types
   au!
   " Remove trailing whitespace from file
   au BufWritePre * %s/\s\+$//e
+
+  " NERDTree starts on startup
+  autocmd vimenter * NERDTree
+  " NERDTree closes when it's the only buffer left open
+  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
 
 " File specific
@@ -282,6 +290,8 @@ augroup java_commands
   au!
   au FileType java <buffer> call SetShift4()
 augroup END
+
+
 
 augroup python_commands
     au!
@@ -298,6 +308,7 @@ filetype plugin indent on
 
 colorscheme solarized
 set background=dark
+
 
 " solarized makes ColorColumn a stupid color
 hi ColorColumn ctermfg=Red
