@@ -312,3 +312,10 @@ set background=dark
 
 " solarized makes ColorColumn a stupid color
 hi ColorColumn ctermfg=Red
+
+" Tell YCM to point to .ycm_extra_conf.py in home if it exists
+" TODO: Uncomment if you can figure out why this doesn't work on personal
+" macbook
+"if system("if ! fileExists .ycm_extra_conf.py; then; echo true; else; echo false; fi") == "true"
+"  let g:ycm_global_ycm_extra_conf="~/.ycm_extra_conf.py"
+"endif
