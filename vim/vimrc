@@ -14,7 +14,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'jiangmiao/auto-pairs'
 
 " NERDTree
-" Plugin 'preservim/nerdtree'
+Plugin 'preservim/nerdtree'
 
 call vundle#end()
 
@@ -279,9 +279,9 @@ augroup all_types
   au BufWritePre * %s/\s\+$//e
 
   " NERDTree starts on startup
-  autocmd vimenter * NERDTree
+  " autocmd vimenter * NERDTree
   " NERDTree closes when it's the only buffer left open
-  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+  " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
 
 " File specific
