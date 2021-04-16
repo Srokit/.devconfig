@@ -14,7 +14,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'jiangmiao/auto-pairs'
 
 " NERDTree
-Plugin 'preservim/nerdtree'
+" Plugin 'preservim/nerdtree'
 
 call vundle#end()
 
