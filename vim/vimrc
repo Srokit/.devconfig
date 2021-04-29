@@ -11,7 +11,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 " Bracket and other paired chars completion
-Plugin 'jiangmiao/auto-pairs'
+" Plugin 'jiangmiao/auto-pairs'
 
 " NERDTree
 Plugin 'preservim/nerdtree'
@@ -22,8 +22,6 @@ if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
   source ~/.googvimrc.vim
 endif
 
-" To see a warning when we hit column 81
-set colorcolumn=81
 
 " turn beeping off
 set noerrorbells visualbell t_vb=
@@ -137,10 +135,6 @@ nnoremap <leader>rft :call RemoteWorkRefreshAndEditThis()<cr>
 
 " Commands for RemoteWork api
 command RemoteWorkClear call RemoteWorkClear()
-
-" Show 80th column
-match ColorColumn "\%80v."
-set colorcolumn=80
 
 " Functions below
 
@@ -284,23 +278,27 @@ augroup all_types
   " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
 
+" May be overridden by one of the file specific auto commands
+match ColorColumn "\%81v."
+
 " File specific
 
 augroup java_commands
   au!
-  au FileType java <buffer> call SetShift4()
+  " au FileType java setlocal shiftwidth=4 tabstop=4 softtabstop=4
+  au BufNewFile,BufRead *.java setlocal shiftwidth=4 tabstop=4 softtabstop=4
+  au BufNewFile,BufRead *.java match ColorColumn "\%101v."
 augroup END
-
-
 
 augroup python_commands
     au!
     " move operator for inside a python function
     " Ex: vif inside a python function will visually select everythin below the
     " def line and including the return statemnt
-    au FileType python onoremap <buffer> if :<c-u>execute "normal! ?^\\def.*$\r/^\\s*return.*$\r$"<cr>
-    au FileType python iabbrev <buffer> tt True
-    au FileType python iabbrev <buffer> ff False
+    au BufNewFile,BufRead *.py onoremap <buffer> if :<c-u>execute "normal! ?^\\def.*$\r/^\\s*return.*$\r$"<cr>
+    au BufNewFile,BufRead *.py iabbrev <buffer> tt True
+    au BufNewFile,BufRead *.py python iabbrev <buffer> ff False
+    au BufNewFile,BufRead *.py python match ColorColumn "\%81v."
 augroup END
 
 syntax on
@@ -310,12 +308,13 @@ colorscheme solarized
 set background=dark
 
 
-" solarized makes ColorColumn a stupid color
-hi ColorColumn ctermfg=Red
-
 " Tell YCM to point to .ycm_extra_conf.py in home if it exists
 " TODO: Uncomment if you can figure out why this doesn't work on personal
 " macbook
 "if system("if ! fileExists .ycm_extra_conf.py; then; echo true; else; echo false; fi") == "true"
 "  let g:ycm_global_ycm_extra_conf="~/.ycm_extra_conf.py"
 "endif
+"
+"
+" To see a warning when we hit column 81
+highlight ColorColumn cterm=bold ctermbg=1 ctermfg=7
