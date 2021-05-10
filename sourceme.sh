@@ -79,7 +79,7 @@ currUserDoesOwn() {
 
 setupHomebrew() {
   homebrewFolders="/usr/local/bin /usr/local/etc /usr/local/sbin /usr/local/share /usr/local/share/doc"
-  if ! currUserDoesOwn $homebrewFolders; then 
+  if ! currUserDoesOwn $homebrewFolders; then
     sudo chown -R $(whoami) ${=homebrewFolders}
     chmod u+w ${=homebrewFolders}
   fi
@@ -153,4 +153,9 @@ elif isWorkMacbook && ! inZshSession; then
   #  that then we must start ourselves here
   zsh
   exit
+fi
+
+# Custom optional local sources
+if fileExists ~/.localsource.sh; then
+  . ~/.localsource.sh
 fi
