@@ -297,8 +297,8 @@ augroup python_commands
     " def line and including the return statemnt
     au BufNewFile,BufRead *.py onoremap <buffer> if :<c-u>execute "normal! ?^\\def.*$\r/^\\s*return.*$\r$"<cr>
     au BufNewFile,BufRead *.py iabbrev <buffer> tt True
-    au BufNewFile,BufRead *.py python iabbrev <buffer> ff False
-    au BufNewFile,BufRead *.py python match ColorColumn "\%81v."
+    au BufNewFile,BufRead *.py iabbrev <buffer> ff False
+    au BufNewFile,BufRead *.py match ColorColumn "\%81v."
 augroup END
 
 syntax on
