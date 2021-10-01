@@ -22,7 +22,7 @@ c() {
 }
 
 v() {
-  vim $@; clear
+  nvim $@; clear
 }
 
 gitdiff() {

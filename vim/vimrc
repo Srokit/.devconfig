@@ -6,22 +6,27 @@ syntax off
 filetype off
 set nocompatible
 
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
+" vim-plug for plugin manager
+call plug#begin('$DEVCONFIG/vim/plugged')
 
-" Bracket and other paired chars completion
-" Plugin 'jiangmiao/auto-pairs'
+Plug 'pangloss/vim-javascript'    " JavaScript support
+Plug 'leafgarland/typescript-vim' " TypeScript syntax
+Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
 
-" NERDTree
-Plugin 'preservim/nerdtree'
+Plug 'dense-analysis/ale'         " ALE shows linter wanrings and other things
 
-call vundle#end()
+Plug 'preservim/nerdtree'         " NerdTree shows the tree of a directory
 
-if system("echo $(hostname)") =~ $USER . "\\.mtv.*"
-  source ~/.googvimrc.vim
-endif
+Plug 'jiangmiao/auto-pairs'       " Close parens of all kinds automatically
 
+Plug 'tpope/vim-commentary'       " Comment and uncomment selections w/ 'gc'
+
+Plug 'mattn/emmet-vim'            " Emmet makes writing html super fast
+
+call plug#end()
+
+" Autocomplete menus easier complete button
+inoremap '' <C-N>
 
 " turn beeping off
 set noerrorbells visualbell t_vb=
@@ -31,14 +36,28 @@ autocmd GUIEnter * set visualbell t_vb=
 inoremap <leader><leader> <esc>
 vnoremap <leader><leader> <esc>
 
+" NERDTree Mapping
+nnoremap <C-n> :NERDTree<cr>
+nnoremap <leader>nf :NERDTreeFocus<cr>
+nnoremap <leader>nt :NERDTreeToggle<cr>
+
+" Ripped from online
+" Start NERDTree when Vim is started without file arguments.
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
+
 " Super fast save
 nnoremap s :w<cr>
 
 " Super fast quit
-nnoremap q :q
+nnoremap q :q<cr>
+
+" When using neovim the edit vim shortcut goes to the shim nvim vimrc which
+" just sources the devconfig vimrc
+let myvimrc = '$DEVCONFIG/vim/vimrc'
 
 " for reloading vimscript
-nnoremap <leader>ev :tabe<space>$MYVIMRC<cr>
+execute 'nnoremap <leader>ev :tabe<space>' . myvimrc . '<cr>'
 nnoremap <leader>sv :source<space>$MYVIMRC<cr>
 
 " work with tabs
@@ -124,15 +143,6 @@ nnoremap <bs> <nop>
 vnoremap <bs> <nop>
 nnoremap <del> <nop>
 
-" For RemoteWorkLocal api
-nnoremap <leader>re :call RemoteWorkEdit('')<left><left>
-nnoremap <leader>rpt :call RemoteWorkPushThis()<cr>
-nnoremap <leader>rp :call RemoteWorkPush('')<left><left>
-nnoremap <leader>rfe :call RemoteWorkRefreshAndEdit('')<left><left>
-nnoremap <leader>rc :call RemoteWorkClear()<cr>
-nnoremap <leader>rf :call RemoteWorkRefresh('')<left><left>
-nnoremap <leader>rft :call RemoteWorkRefreshAndEditThis()<cr>
-
 " Commands for RemoteWork api
 command RemoteWorkClear call RemoteWorkClear()
 
@@ -150,120 +160,6 @@ function SetShift2()
     set softtabstop=2
 endfunction
 
-"" Remote Work Helpers
-
-function PullFileFromRemoteWork(remote_file, local_file)
-"  execute "!zsh -c 'source ~/.devconfig/sourceme.sh && scpFromRemoteWork " . a:remote_file . " " . a:local_file . "'"
-  execute "!scp $REMOTE_WORK_USER@$REMOTE_WORK_HOST:" . a:remote_file . " " . a:local_file
-  return (v:shell_error == 0)
-endfunction
-
-function PushFileToRemoteWork(local_file, remote_file)
-  execute "!zsh -c 'source ~/.devconfig/sourceme.sh && scpToRemoteWork " . a:local_file . " " . a:remote_file . "'"
-  return (v:shell_error == 0)
-endfunction
-
-function LocalAbsPathForRemoteWorkFile(file)
-  return g:local_remote_work_top . '/' .  a:file
-endfunction
-
-function RemoteAbsPathForRemoteWorkFile(file)
-  return g:remote_remote_work_top . '/' . a:file
-endfunction
-
-function PullFileFromRemoteWorkRelativeToTop(file)
-  return PullFileFromRemoteWork(RemoteAbsPathForRemoteWorkFile(a:file), LocalAbsPathForRemoteWorkFile(a:file))
-endfunction
-
-function PushFileToRemoteWorkRelativeToTop(file)
-  return PushFileToRemoteWork(LocalAbsPathForRemoteWorkFile(a:file), RemoteAbsPathForRemoteWorkFile(a:file))
-endfunction
-
-function PathOnly(file)
-  " Super dirty implementation because I don't know vimscript lol
-  let l:i = strlen(a:file) - 1
-  let l:new_file = a:file
-  while l:new_file[l:i] != '/'
-    let l:i = l:i - 1
-    let l:new_file = l:new_file[0:l:i]
-  endwhile
-  return l:new_file
-endfunction
-
-function CurrentFile()
-  return expand('%:p')
-endfunction
-
-function RemoteWorkRelativePathFromFullPath(path)
-  return substitute(l:current_file, g:local_remote_work_top, "", "")
-endfunction
-
-function PushCurrentFileToRemoteWork()
-  let l:file = RemoteWorkRelativePathFromFullPath(CurrentFile())
-  call PushFileToRemoteWorkRelativeToTop(l:file)
-endfunction
-
-"" END Remote Work Helpers
-
-"" Remote Work Interface
-
-function RemoteWorkClear()
-  call delete(g:local_remote_work_top, 'rf')
-endfunction
-
-function RemoteWorkDelete(file)
-  call delete(a:file)
-endfunction
-
-function RemoteWorkRefresh(file)
-  call RemoteWorkDelete(a:file)
-  let l:local_file = LocalAbsPathForRemoteWorkFile(a:file)
-  call mkdir(PathOnly(l:local_file), 'p')
-  call PullFileFromRemoteWorkRelativeToTop(a:file)
-endfunction
-
-function RemoteWorkRefreshThis()
-  call RemoteWorkRefresh(RemoteWorkRelativePathFromFullPath(CurrentFile()))
-endfunction
-
-function RemoteWorkPush(file)
-  call PushFileToRemoteWorkRelativeToTop(a:file)
-endfunction
-
-function RemoteWorkPushThis()
-  call PushCurrentFileToRemoteWork()
-endfunction
-
-function RemoteWorkEdit(file)
-  execute "e " . LocalAbsPathForRemoteWorkFile(a:file)
-endfunction
-
-function RemoteWorkEditThis()
-  execute "e! " . CurrentFile()
-endfunction
-
-function RemoteWorkRefreshAndEdit(file)
-  call RemoteWorkRefresh(a:file)
-  call RemoteWorkEdit(a:file)
-endfunction
-
-function RemoteWorkRefreshAndEditThis()
-  call RemoteWorkRefreshThis()
-  call RemoteWorkEditThis()
-endfunction
-
-"" END Remote Work Interface
-
-" Remote Work Configuration
-
-" Set global remote work local path for push and pull
-let g:local_remote_work_top = $LOCAL_REMOTE_WORK_TOP
-
-" Change this when root of local work should change
-let g:remote_remote_work_top = "/ssd1/srok/android/sc-d1-dev"
-
-"" END Remote Work Configuration
-
 " Default exapnd tabs to 2 spaces
 call SetShift2()
 
@@ -271,11 +167,6 @@ augroup all_types
   au!
   " Remove trailing whitespace from file
   au BufWritePre * %s/\s\+$//e
-
-  " NERDTree starts on startup
-  " autocmd vimenter * NERDTree
-  " NERDTree closes when it's the only buffer left open
-  " autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
 
 " May be overridden by one of the file specific auto commands
@@ -285,7 +176,6 @@ match ColorColumn "\%81v."
 
 augroup java_commands
   au!
-  " au FileType java setlocal shiftwidth=4 tabstop=4 softtabstop=4
   au BufNewFile,BufRead *.java setlocal shiftwidth=4 tabstop=4 softtabstop=4
   au BufNewFile,BufRead *.java match ColorColumn "\%101v."
 augroup END
@@ -299,20 +189,36 @@ augroup python_commands
     au BufNewFile,BufRead *.py match ColorColumn "\%81v."
 augroup END
 
+" Use the command 'gq' to format certain parts of buffer
+augroup prettier_as_formatter_commands
+    au!
+    au FileType javascript setlocal formatprg=prettier
+    au FileType javascript.jsx setlocal formatprg=prettier
+    au FileType html setlocal formatprg=js-beautify\ --type\ html
+    au FileType scss setlocal formatprg=prettier\ --parser\ css
+    au FileType html setlocal formatprg=prettier\ --parser\ css
+augroup END
+
 syntax on
 filetype plugin indent on
 
 colorscheme solarized
 set background=dark
 
-
-" Tell YCM to point to .ycm_extra_conf.py in home if it exists
-" TODO: Uncomment if you can figure out why this doesn't work on personal
-" macbook
-"if system("if ! fileExists .ycm_extra_conf.py; then; echo true; else; echo false; fi") == "true"
-"  let g:ycm_global_ycm_extra_conf="~/.ycm_extra_conf.py"
-"endif
-"
-"
 " To see a warning when we hit column 81
 highlight ColorColumn cterm=bold ctermbg=1 ctermfg=7
+
+" ALE settings
+let g:ale_linters = {
+\   'python': ['flake8', 'pylint'],
+\   'javascript': ['eslint'],
+\   'css': ['stylelint']
+\}
+let g:ale_fixers = {
+\   'javascript': ['eslint'],
+\   'html': ['pretter']
+\}
+let g:ale_fix_on_save = 1
+
+" Other vim configurations
+source $DEVCONFIG/vim/react.vim

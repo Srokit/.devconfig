@@ -1,4 +1,6 @@
 vim/bundle/
 vim/cache/
 vim/sessions/
+vim/autoload/
+vim/plugged/
 set_android_env_generated.sh
