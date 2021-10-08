@@ -41,7 +41,7 @@ isWorkRemote() {
 }
 
 isPersonalMacbook() {
-  [[ $(hostname) = *Stanleys-MBP* ]]
+  [[ $(hostname) = *Stanleys-MacBook-Pro* ]]
 }
 
 inTmuxSession() {
