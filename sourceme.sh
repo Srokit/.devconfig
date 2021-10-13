@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ~/.devconfig/helpers.sh
+source ~/.devconfig/helpers.sh
 
 # Env vars
 
@@ -96,22 +96,6 @@ gitConfGlobAlias re rebase
 
 git config --global credential.helper store
 git config --global pull.rebase false
-
-if isWorkMacbook; then
-  if ! fileExists ~/.goog-envsetup-macbook.sh; then
-    echo "cannot source env vars from ~/.goog-envsetup-macbook.sh.\
-No such file exists"
-  else
-    . ~/.goog-envsetup-macbook.sh
-  fi
-elif isWorkRemote; then
-  if ! fileExists ~/.goog-envsetup-remote.sh; then
-    echo "Cannot source env vars from ~/.goog-envsetup-remote.sh.\
-No such file exists"
-  else
-    . ~/.goog-envsetup-remote.sh
-  fi
-fi
 
 if ! isPersonalMacbook; then
   # macros shared by remote and local workstations
