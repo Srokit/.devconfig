@@ -28,7 +28,7 @@ if osIsMac; then
   if ! cmdExists brew; then
     echo "installing homebrew"
     /bin/sh -c \
-      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
+      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   else
     echo "homebrew already installed"
   fi
@@ -40,14 +40,23 @@ pmInstall python3
 # Git
 pmInstall git
 
+# Install neovim
+pmInstall neovim
+alias vim=nvim
+
 # Vim
 rm -rf ~/.vim
 ln -s ~/.devconfig/vim ~/.vim
 
-# Vundle for vim plugins
-if ! dirExists ~/.vim/bundle/Vundle.vim; then
-  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-  vim +PluginInstall +qall
+# Nvim config
+rm -f ~/.config/nvim/init.vim
+mkdir -p ~/.config/nvim/
+ln -s ~/.devconfig/nvim_init.vim ~/.config/nvim/init.vim
+
+# VimPlug for vim plugins
+if ! fileExists ~/.vim/autoload/plug.vim; then
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
 # Tmux
