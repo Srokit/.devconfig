@@ -1,10 +1,8 @@
 #!/bin/bash
 # Helpers functions used by devconfig scripts
 
-if [[ -z "$REMOTE_WORK_HOST" || -z "$REMOTE_WORK_USER" ]]; then
-  export REMOTE_WORK_HOST="nomatch"
-  export REMOTE_WORK_USER="nomatch"
-fi
+export REMOTE_WORK_HOST="srokcros.c.googlers.com"
+export REMOTE_WORK_USER="srok"
 
 scpToRemoteWork() {
   echo "Running: scp $1 $REMOTE_WORK_USER@$REMOTE_WORK_HOST:$2"
