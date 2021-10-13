@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Exit on error
-set -e
-
 . ~/.devconfig/helpers.sh
 
 pmInstall() {
@@ -76,7 +73,6 @@ if ! dirExists ~/.oh-my-zsh; then
 else
   echo "oh-my-zsh already installed"
 fi
+
 rm -f ~/.zshrc
 ln -s ~/.devconfig/zshrc ~/.zshrc
-
-# Finally install actual npm
