@@ -97,6 +97,10 @@ gitConfGlobAlias re rebase
 git config --global credential.helper store
 git config --global pull.rebase false
 
+if isWorkRemote; then
+  export REMOTE_WORK="true"
+fi
+
 if ! isPersonalMacbook; then
   # macros shared by remote and local workstations
   if ! fileExists ~/.goog-common-setup.sh; then

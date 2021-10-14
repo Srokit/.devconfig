@@ -6,6 +6,10 @@ syntax off
 filetype off
 set nocompatible
 
+function IsRemoteWork()
+  return !empty($REMOTE_WORK)
+endfunction
+
 " vim-plug for plugin manager
 call plug#begin('$DEVCONFIG/vim/plugged')
 
@@ -13,7 +17,9 @@ Plug 'pangloss/vim-javascript'    " JavaScript support
 Plug 'leafgarland/typescript-vim' " TypeScript syntax
 Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
 
-Plug 'dense-analysis/ale'         " ALE shows linter wanrings and other things
+if !IsRemoteWork()
+  Plug 'dense-analysis/ale'         " ALE shows linter wanrings and other things
+endif
 
 Plug 'preservim/nerdtree'         " NerdTree shows the tree of a directory
 
